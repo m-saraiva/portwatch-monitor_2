@@ -494,7 +494,14 @@ var options = {
   }
 };
 
+var globalChart; // Store chart reference
+
 var createDisruptionAisChart = function (data, chartType = "portcalls", ma_days=7) {
+  // Destroy existing chart before creating a new one
+  if (globalChart) {
+    globalChart.destroy();
+  }
+
   options["yAxis"] = {
     title: {
       text: labels[chartType].yAxis,
@@ -601,7 +608,7 @@ var createDisruptionAisChart = function (data, chartType = "portcalls", ma_days=
 
   options["subtitle"] = null;
 
-  var chart = new Highcharts.stockChart("container", options);
+  globalChart = new Highcharts.stockChart("container", options);
 };
 
 
