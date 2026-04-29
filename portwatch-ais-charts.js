@@ -201,7 +201,7 @@ var parseChokepoint = function (features) {
       portname: feature.attributes.portname,
       n_container: parseInt(feature.attributes.n_container),
       n_dry_bulk: parseInt(feature.attributes.n_dry_bulk),
-      n_general_cargo: parseInt(feature.attributes. n_general_cargo),
+      n_general_cargo: parseInt(feature.attributes.n_general_cargo),
       n_roro: parseInt(feature.attributes.n_roro),
       n_tanker: parseInt(feature.attributes.n_tanker),
       n: parseInt(feature.attributes.n_total),
@@ -579,7 +579,7 @@ var createDisruptionAisChart = function (data, chartType = "portcalls", ma_days=
     {
       name: "Prior Year: "+ma_days+"-day Moving Average",
       data: data
-        .slice(shift + 1)
+        .slice(shift)
         .map((x) => [x.date, x[chartType + "_MA_shifted"]]),
       type: "line",
       marker: {
