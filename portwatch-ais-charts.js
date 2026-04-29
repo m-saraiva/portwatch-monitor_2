@@ -196,7 +196,7 @@ var parsePort = function (features) {
 var parseChokepoint = function (features) {
   var series = features.map((feature) => {
     datapoint = {
-      date: feature.attributes.date,
+      date: Date.parse(feature.attributes.date),
       portid: feature.attributes.portid,
       portname: feature.attributes.portname,
       n_container: parseInt(feature.attributes.n_container),
@@ -214,6 +214,13 @@ var parseChokepoint = function (features) {
     };
     return datapoint;
   });
+
+  // Remove duplicates by date (keep last record for each date)
+  const uniqueSeries = {};
+  series.forEach((item) => {
+    uniqueSeries[item.date] = item;
+  });
+  series = Object.values(uniqueSeries);
 
   series.sort((a, b) => a.date - b.date);
   return series;
@@ -501,6 +508,8 @@ var createDisruptionAisChart = function (data, chartType = "portcalls", ma_days=
   if (globalChart) {
     globalChart.destroy();
   }
+
+
 
   options["yAxis"] = {
     title: {
