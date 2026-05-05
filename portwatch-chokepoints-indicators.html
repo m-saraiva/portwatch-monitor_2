@@ -81,21 +81,30 @@ var queryAndChartData = function (portid) {
       const portLayer = new FeatureLayer({
         url: portsUrl,
       });
-      const portQuery = new Query({
-        where: "portid='" + portid + "'",
-        outFields: "*",
-        cacheHint: true,
-        maxRecordCountFactor: 5,
-      });
+      async function fetchAllFeatures(where) {
+        const pageSize = 2000;
+        let allFeatures = [];
+        let offset = 0;
+        let exceeded = true;
+        while (exceeded) {
+          const q = new Query({
+            where: where,
+            outFields: "*",
+            cacheHint: true,
+            num: pageSize,
+            start: offset,
+          });
+          const result = await portLayer.queryFeatures(q);
+          allFeatures = allFeatures.concat(result.features);
+          exceeded = result.exceededTransferLimit === true;
+          offset += pageSize;
+        }
+        return allFeatures;
+      }
 
       async function executeDynamicQueries(portid) {
-        const promises = [
-          portLayer.queryFeatures(portQuery).then((result) => {
-            return parseChokepoint(result.features);
-          })
-        ];
-        const results = await Promise.all(promises);
-        return results;
+        const features = await fetchAllFeatures("portid='" + portid + "'");
+        return [parseChokepoint(features)];
       }
 
       executeDynamicQueries(portid).then((results) => {
